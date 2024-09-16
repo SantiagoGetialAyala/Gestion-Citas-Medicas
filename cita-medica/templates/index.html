@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Citas Médicas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+        h1 {
+            color: #3a6073;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #3a6073;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #1a4564;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #3a6073;
+            color: white;
+        }
+        td {
+            background-color: #f9fafc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gestión de Citas Médicas</h1>
+
+    <form action="/schedule" method="POST">
+        <label for="patient">Nombre del Paciente</label>
+        <input type="text" id="patient" name="patient" required>
+
+        <label for="document_type">Tipo de Documento</label>
+        <select id="document_type" name="document_type" required>
+            <option value="CC">Cédula de Ciudadanía</option>
+            <option value="TI">Tarjeta de Identidad</option>
+        </select>
+
+        <label for="document">Número de Documento</label>
+        <input type="text" id="document" name="document" required>
+
+        <label for="doctor">Doctor</label>
+        <select id="doctor" name="doctor" required>
+            {% for doctor in doctors %}
+                <option value="{{ doctor }}">{{ doctor }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="date">Fecha</label>
+        <input type="date" id="date" name="date" required>
+
+        <label for="time">Hora</label>
+        <select id="time" name="time" required>
+            {% for time in available_times %}
+                <option value="{{ time }}">{{ time }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Agendar Cita</button>
+    </form>
+
+    <h2>Citas Agendadas</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Paciente</th>
+                <th>Doctor</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appointment in appointments %}
+            <tr>
+                <td>{{ appointment.patient }}</td>
+                <td>{{ appointment.doctor }}</td>
+                <td>{{ appointment.date }}</td>
+                <td>{{ appointment.time }}</td>
+                <td>
+                    <form action="/cancel/{{ loop.index0 }}" method="POST">
+                        <button type="submit">Cancelar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Historial de Citas</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Paciente</th>
+                <th>Doctor</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appointment in appointment_history %}
+            <tr>
+                <td>{{ appointment.patient }}</td>
+                <td>{{ appointment.doctor }}</td>
+                <td>{{ appointment.date }}</td>
+                <td>{{ appointment.time }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <form action="/undo_cancel" method="POST">
+        <button type="submit">Deshacer Última Cancelación</button>
+    </form>
+</body>
+</html>
